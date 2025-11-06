@@ -28,12 +28,14 @@
 
         public Car(string brand, string model, string carColor, int year, bool isRented, double carRentPrice)
         {
+            Id = defaultId;
             Brand = brand;
             Model = model;
             CarColor = carColor;
             Year = year;
             CarRentPrice = carRentPrice;
             IsRented = isRented;
+            defaultId++;
         }
     }
 }
