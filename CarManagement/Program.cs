@@ -166,7 +166,7 @@ switch (choice)
         }
         break;
     case 2:
-        Console.WriteLine("You are now in car sale section !");
+        Console.WriteLine("You are now in rent a car section !");
         Console.WriteLine("1. Add a car");
         Console.WriteLine("2. Display All Cars");
         Console.WriteLine("3. Remove a car");
@@ -189,22 +189,40 @@ switch (choice)
                 {
                     if (cars[i].IsRented)
                     {
-                        Console.WriteLine($"{i + 1}. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
+                        Console.WriteLine($"{cars[i].Id}. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
                     }
                 }
-                int removeCar = Convert.ToInt32(Console.ReadLine());
-                if (removeCar > 0 && removeCar <= cars.Count && cars[removeCar - 1].IsRented)
+
+                var availableCars = cars.Where(car => car.IsRented == true).ToList();
+
+                if (availableCars.Count == 0)
                 {
-                    cars.RemoveAt(removeCar - 1);
-                    Console.WriteLine("Car removed successfully.");
+                    Console.WriteLine("No cars found in a list !");
                 }
                 else
                 {
-                    Console.WriteLine("Invalid selection. Please try again.");
+                    Console.WriteLine("Available cars for removal:");
+                    foreach (var car in availableCars)
+                    {
+                        Console.WriteLine($"ID: {car.Id} | {car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
+                    }
                 }
-                
 
-                break;
+                Console.Write("Enter id to remove a car: ");
+                int removeCarID = Convert.ToInt32(Console.ReadLine());
+
+                var removedCar = cars.Find(car => car.Id == removeCarID && car.IsRented == true);
+
+                if (removedCar != null)
+                {
+                    cars.Remove(removedCar);
+                    Console.WriteLine($"Car found with ID {removeCarID} and removed successfully!\n");
+                }
+                else
+                {
+                    Console.WriteLine("Car is not found in a car sale list.");
+                }
+                goto start;
             case 4:
                 Console.WriteLine("Enter the year ");
                 int filterYear = Convert.ToInt32(Console.ReadLine());
@@ -212,10 +230,10 @@ switch (choice)
                 Console.WriteLine($"---Cars from year {filterYear} available for rent---");
                 for (int i = 0; i < filteredCars.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {filteredCars[i].Brand} {filteredCars[i].Model} - {filteredCars[i].CarColor} - {filteredCars[i].Year} - Rent Price: ${filteredCars[i].CarRentPrice}/day");
+                    Console.WriteLine($"{filteredCars[i].Id}. {filteredCars[i].Brand} {filteredCars[i].Model} - {filteredCars[i].CarColor} - {filteredCars[i].Year} - Rent Price: ${filteredCars[i].CarRentPrice}/day");
                 }
 
-                break;
+                goto start;
             case 5:
                 Console.WriteLine("---Cars sorted by rent price (low to high)");
                
@@ -224,14 +242,14 @@ switch (choice)
                 {
                     Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - Rent Price: ${car.CarRentPrice}/day");
                 }
-                break;
+                goto start;
             case 6:
                 Console.WriteLine("---Cars available for rent---");
                 for (int i = 0; i < cars.Count; i++)
                 {
                     if (cars[i].IsRented)
                     {
-                        Console.WriteLine($"{i }. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
+                        Console.WriteLine($"{cars[i].Id}. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
                     }
                 }
                 Console.WriteLine("Select a car: ");
@@ -246,13 +264,13 @@ switch (choice)
                     Console.WriteLine("Invalid selection. Please try again.");
                 }
 
-                break;
+                goto start;
             case 0:
                 Console.WriteLine("Returned to the main menu...");
                 goto start;
             default:
                 Console.WriteLine("Exitted from rent a car section !");
-                break;
+                goto start;
         }
         break;
     case 3:
