@@ -178,16 +178,74 @@ switch (choice)
         switch (rentInput)
         {
             case 1:
+                
                 break;
             case 2:
+
                 break;
             case 3:
+                Console.WriteLine("---Cars available for rent---");
+                for (int i = 0; i < cars.Count; i++)
+                {
+                    if (cars[i].IsRented)
+                    {
+                        Console.WriteLine($"{i + 1}. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
+                    }
+                }
+                int removeCar = Convert.ToInt32(Console.ReadLine());
+                if (removeCar > 0 && removeCar <= cars.Count && cars[removeCar - 1].IsRented)
+                {
+                    cars.RemoveAt(removeCar - 1);
+                    Console.WriteLine("Car removed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid selection. Please try again.");
+                }
+                
+
                 break;
             case 4:
+                Console.WriteLine("Enter the year ");
+                int filterYear = Convert.ToInt32(Console.ReadLine());
+                var filteredCars = cars.Where(c => c.Year == filterYear && c.IsRented).ToList();
+                Console.WriteLine($"---Cars from year {filterYear} available for rent---");
+                for (int i = 0; i < filteredCars.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {filteredCars[i].Brand} {filteredCars[i].Model} - {filteredCars[i].CarColor} - {filteredCars[i].Year} - Rent Price: ${filteredCars[i].CarRentPrice}/day");
+                }
+
                 break;
             case 5:
+                Console.WriteLine("---Cars sorted by rent price (low to high)");
+               
+                var sortedCars = cars.Where(c => c.IsRented).OrderBy(c => c.CarRentPrice).ToList();
+               foreach (var car in sortedCars)
+                {
+                    Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - Rent Price: ${car.CarRentPrice}/day");
+                }
                 break;
             case 6:
+                Console.WriteLine("---Cars available for rent---");
+                for (int i = 0; i < cars.Count; i++)
+                {
+                    if (cars[i].IsRented)
+                    {
+                        Console.WriteLine($"{i }. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
+                    }
+                }
+                Console.WriteLine("Select a car: ");
+                int rentCar = Convert.ToInt32(Console.ReadLine());
+                if (rentCar > 0 && rentCar <= cars.Count && cars[rentCar - 1].IsRented)
+                {
+                    cars[rentCar ].IsRented = false;
+                    Console.WriteLine("Car rented successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid selection. Please try again.");
+                }
+
                 break;
             case 0:
                 Console.WriteLine("Returned to the main menu...");
