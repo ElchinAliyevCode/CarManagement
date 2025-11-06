@@ -2,6 +2,7 @@
 {
     class Car
     {
+        public static int defaultId = 0;
         public int Id { get; set; }
         public string Brand { get; set; }
         public string Model { get; set; }
@@ -15,12 +16,14 @@
 
         public Car(string brand, string model, string carColor, int year, double carPrice, bool isRented)
         {
+            Id = defaultId;
             Brand = brand;
             Model = model;
             CarColor = carColor;
             Year = year;
             CarPrice = carPrice;
             IsRented = isRented;
+            defaultId++;
         }
 
         public Car(string brand, string model, string carColor, int year, bool isRented, double carRentPrice)
