@@ -57,32 +57,14 @@ switch (choice)
                 cars.Add(newCar);
 
                 Console.WriteLine("Car added successfully!\n");
-
-                Console.WriteLine("All Cars in Sale List:");
-                foreach (var car in cars)
-                {
-                    if (!car.IsRented)
-                        Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
-                }
-                Console.WriteLine();
+                ShowInfo();
+                
                 goto start;
             case 2:
-                Console.WriteLine("All Cars in Sale List:");
-                foreach (var car in cars)
-                {
-                    if (!car.IsRented)
-                        Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
-                }
-                Console.WriteLine();
+                ShowInfo();
                 goto start;
             case 3:
-                Console.WriteLine("All Cars in Sale List:");
-                foreach (var car in cars)
-                {
-                    if (!car.IsRented)
-                        Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
-                }
-                Console.WriteLine();
+                ShowInfo();
 
                 var availableCars = cars.Where(car => car.IsRented == false).ToList();
 
@@ -116,13 +98,7 @@ switch (choice)
 
                 goto start;
             case 4:
-                Console.WriteLine("All Cars in Sale List:");
-                foreach (var car in cars)
-                {
-                    if (!car.IsRented)
-                        Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
-                }
-                Console.WriteLine();
+                ShowInfo();
 
                 Console.Write("Enter a year to filter cars: ");
                 int yearForFilter = Convert.ToInt32(Console.ReadLine());
@@ -178,11 +154,29 @@ switch (choice)
         switch (rentInput)
         {
             case 1:
-                
-                break;
-            case 2:
+                Console.Write("Enter car brand: ");
+                string brand = Console.ReadLine();
+                Console.Write("Enter car model: ");
+                string model = Console.ReadLine();
+                Console.Write("Enter car color: ");
+                string color = Console.ReadLine();
+                Console.Write("Enter car year: ");
+                int year = Convert.ToInt32(Console.ReadLine());
+                Console.Write("Enter car price: ");
+                double carRentPrice = Convert.ToDouble(Console.ReadLine());
 
-                break;
+                Car newCar = new Car(brand, model, color, year, true , carRentPrice);
+
+                cars.Add(newCar);
+
+                Console.WriteLine("Car added successfully!\n");
+                ShowInfo2();
+
+                goto start;
+            case 2:
+                ShowInfo2();
+
+                goto start;
             case 3:
                 Console.WriteLine("---Cars available for rent---");
                 for (int i = 0; i < cars.Count; i++)
@@ -292,3 +286,26 @@ switch (choice)
 #region Rent a Car
 
 #endregion
+
+
+
+void ShowInfo()
+{
+    Console.WriteLine("All Cars in Sale List:");
+    foreach (var car in cars)
+    {
+        if (!car.IsRented)
+            Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
+    }
+    Console.WriteLine();
+}
+void ShowInfo2()
+{
+    Console.WriteLine("All Cars in Rent List:");
+    foreach (var car in cars)
+    {
+        if (car.IsRented)
+            Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarRentPrice} AZN");
+    }
+    Console.WriteLine();
+}
