@@ -13,6 +13,7 @@
 
         public double CarPrice { get; set; }
         public double CarRentPrice { get; set; }
+        public bool IsCurrentlyRented { get; set; }
 
         public Car(string brand, string model, string carColor, int year, double carPrice, bool isRented)
         {
@@ -35,6 +36,7 @@
             Year = year;
             CarRentPrice = carRentPrice;
             IsRented = isRented;
+            IsCurrentlyRented = false;
             defaultId++;
         }
     }
