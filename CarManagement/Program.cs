@@ -11,6 +11,7 @@ Car car9 = new Car("Audi", "A6", "Black", 2018, 36000, false);
 Car car10 = new Car("BYD", "Destroyer 05", "Gray", 2025, 25000, false);
 
 List<Car> cars = new List<Car>() { car1, car2, car3, car4, car5, car6, car7, car8, car9, car10 };
+Bank bank = new Bank();
 
 mainStart:
 Console.WriteLine("Welcome to the Car Sales:");
@@ -23,7 +24,7 @@ int choice = Convert.ToInt32(Console.ReadLine());
 
 
 start:
-#region Car Sales
+
 
 switch (choice)
 {
@@ -40,6 +41,8 @@ switch (choice)
         int saleInput = Convert.ToInt32(Console.ReadLine());
         switch (saleInput)
         {
+            //Sale
+
             case 1:
                 Console.Write("Enter car brand: ");
                 string brand = Console.ReadLine();
@@ -51,14 +54,20 @@ switch (choice)
                 int year = Convert.ToInt32(Console.ReadLine());
                 Console.Write("Enter car price: ");
                 double price = Convert.ToDouble(Console.ReadLine());
+                if (price > bank.Balance)
+                {
+                    Console.WriteLine("Not enoug balance");
+                    goto start;
+                }
 
                 Car newCar = new Car(brand, model, color, year, price, false);
 
                 cars.Add(newCar);
+                bank.WithDraw(price, "Purchase");
 
                 Console.WriteLine("Car added successfully!\n");
                 ShowInfo();
-                
+
                 goto start;
             case 2:
                 ShowInfo();
@@ -103,7 +112,7 @@ switch (choice)
                 Console.Write("Enter a year to filter cars: ");
                 int yearForFilter = Convert.ToInt32(Console.ReadLine());
 
-                var filteredCars = cars.FindAll(car => car.Year == yearForFilter);
+                var filteredCars = cars.FindAll(car => car.Year > yearForFilter);
 
                 foreach (var car in filteredCars)
                 {
@@ -132,7 +141,23 @@ switch (choice)
                 Console.WriteLine();
                 goto start;
             case 6:
-                break;
+                ShowInfo();
+                Console.Write("Enter id for selling: ");
+                var idForSelling = Convert.ToInt32(Console.ReadLine());
+                var toSell = cars.Find(c => c.Id == idForSelling && c.IsRented == false);
+                if (toSell != null)
+                {
+                    bank.Deposit(toSell.CarPrice, "Sale");
+                    cars.Remove(toSell);
+                    Console.WriteLine("Car sold");
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine("Car not found");
+                    Console.WriteLine();
+                }
+                goto start;
             case 0:
                 Console.WriteLine("Returned to the main menu...");
                 goto mainStart;
@@ -141,6 +166,9 @@ switch (choice)
                 break;
         }
         break;
+
+    //Rent
+
     case 2:
         Console.WriteLine("You are now in rent a car section !");
         Console.WriteLine("1. Add a car");
@@ -150,6 +178,7 @@ switch (choice)
         Console.WriteLine("5. Sort cars");
         Console.WriteLine("6. Rent a car");
         Console.WriteLine("0. Exit");
+        Console.Write("Enter your choice: ");
         int rentInput = Convert.ToInt32(Console.ReadLine());
         switch (rentInput)
         {
@@ -165,28 +194,19 @@ switch (choice)
                 Console.Write("Enter car price: ");
                 double carRentPrice = Convert.ToDouble(Console.ReadLine());
 
-                Car newCar = new Car(brand, model, color, year, true , carRentPrice);
+                Car newCar = new Car(brand, model, color, year, true, carRentPrice);
 
                 cars.Add(newCar);
 
                 Console.WriteLine("Car added successfully!\n");
-                ShowInfo2();
+                ShowInfoForRenting();
 
                 goto start;
             case 2:
-                ShowInfo2();
+                ShowInfoForRenting();
 
                 goto start;
             case 3:
-                Console.WriteLine("---Cars available for rent---");
-                for (int i = 0; i < cars.Count; i++)
-                {
-                    if (cars[i].IsRented)
-                    {
-                        Console.WriteLine($"{cars[i].Id}. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
-                    }
-                }
-
                 var availableCars = cars.Where(car => car.IsRented == true).ToList();
 
                 if (availableCars.Count == 0)
@@ -198,7 +218,7 @@ switch (choice)
                     Console.WriteLine("Available cars for removal:");
                     foreach (var car in availableCars)
                     {
-                        Console.WriteLine($"ID: {car.Id} | {car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
+                        Console.WriteLine($"ID: {car.Id} | {car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarRentPrice} AZN");
                     }
                 }
 
@@ -218,9 +238,10 @@ switch (choice)
                 }
                 goto start;
             case 4:
-                Console.WriteLine("Enter the year ");
+                ShowInfoForRenting();
+                Console.Write("Enter the year: ");
                 int filterYear = Convert.ToInt32(Console.ReadLine());
-                var filteredCars = cars.Where(c => c.Year == filterYear && c.IsRented).ToList();
+                var filteredCars = cars.Where(c => c.Year > filterYear && c.IsRented).ToList();
                 Console.WriteLine($"---Cars from year {filterYear} available for rent---");
                 for (int i = 0; i < filteredCars.Count; i++)
                 {
@@ -230,58 +251,76 @@ switch (choice)
                 goto start;
             case 5:
                 Console.WriteLine("---Cars sorted by rent price (low to high)");
-               
+
                 var sortedCars = cars.Where(c => c.IsRented).OrderBy(c => c.CarRentPrice).ToList();
-               foreach (var car in sortedCars)
+                foreach (var car in sortedCars)
                 {
                     Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - Rent Price: ${car.CarRentPrice}/day");
                 }
                 goto start;
             case 6:
-                Console.WriteLine("---Cars available for rent---");
-                for (int i = 0; i < cars.Count; i++)
+                var availableCarsForRent = cars.Where(c => c.IsRented == true && c.IsCurrentlyRented == false).ToList();
+                if (availableCarsForRent.Count == 0)
                 {
-                    if (cars[i].IsRented)
-                    {
-                        Console.WriteLine($"{cars[i].Id}. {cars[i].Brand} {cars[i].Model} - {cars[i].CarColor} - {cars[i].Year} - Rent Price: ${cars[i].CarRentPrice}/day");
-                    }
+                    Console.WriteLine("No rented car left");
+                    Console.WriteLine();
+                    goto start;
                 }
-                Console.WriteLine("Select a car: ");
-                int rentCar = Convert.ToInt32(Console.ReadLine());
-                if (rentCar > 0 && rentCar <= cars.Count && cars[rentCar - 1].IsRented)
+                ShowNotRentedCars();
+
+                Console.Write("Enter id for rent a car: ");
+                var idForRent = Convert.ToInt32(Console.ReadLine());
+                var toRent = availableCarsForRent.Find(c => c.Id == idForRent);
+                if (toRent == null)
                 {
-                    cars[rentCar ].IsRented = false;
-                    Console.WriteLine("Car rented successfully.");
+                    Console.WriteLine("Car not found");
+                    goto start;
                 }
-                else
+                if (toRent.CarRentPrice > bank.Balance)
                 {
-                    Console.WriteLine("Invalid selection. Please try again.");
+                    Console.WriteLine("Balance not enough");
+                    goto start;
                 }
 
+                bank.WithDraw(toRent.CarRentPrice, "Rent");
+                toRent.IsCurrentlyRented = true;
+                Console.WriteLine("You Succesfully rent a car");
                 goto start;
             case 0:
                 Console.WriteLine("Returned to the main menu...");
-                goto start;
+                goto mainStart;
             default:
                 Console.WriteLine("Exitted from rent a car section !");
                 goto start;
         }
-        break;
+
+    //Bank
+
     case 3:
         Console.WriteLine("You are now in bank section !");
-        Console.WriteLine("1. Bank Account");
+        Console.WriteLine("1. Add money to bank account");
         Console.WriteLine("2. Transactions");
+        Console.WriteLine("3. Bank Account");
         Console.WriteLine("0. Exit");
+        Console.Write("Enter your choice: ");
         int bankInput = Convert.ToInt32(Console.ReadLine());
         switch (bankInput)
         {
             case 1:
-                break;
+                Console.Write("Enter amount: ");
+                var amountForDeposit = Convert.ToDouble(Console.ReadLine());
+                bank.Deposit(amountForDeposit, "Deposit");
+                Console.WriteLine("Amount added to your account");
+                goto start;
             case 2:
-                break;
+                bank.ShowTransactions();
+                goto start;
+            case 3:
+                Console.WriteLine($"Your balance: {bank.Balance}");
+                goto start;
             case 0:
                 Console.WriteLine("Returned to the main menu...");
-                goto start;
+                goto mainStart;
             default:
                 Console.WriteLine("Exitted from bank section !");
                 break;
@@ -295,16 +334,6 @@ switch (choice)
         break;
 }
 
-#endregion
-
-#region Bank
-
-#endregion
-
-#region Rent a Car
-
-#endregion
-
 
 
 void ShowInfo()
@@ -313,17 +342,30 @@ void ShowInfo()
     foreach (var car in cars)
     {
         if (!car.IsRented)
-            Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
+            Console.WriteLine($"ID: {car.Id} | {car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarPrice} AZN");
     }
     Console.WriteLine();
 }
-void ShowInfo2()
+void ShowInfoForRenting()
 {
     Console.WriteLine("All Cars in Rent List:");
     foreach (var car in cars)
     {
         if (car.IsRented)
-            Console.WriteLine($"{car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarRentPrice} AZN");
+            Console.WriteLine($"ID: {car.Id} | {car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarRentPrice} AZN");
+    }
+    Console.WriteLine();
+}
+
+void ShowNotRentedCars()
+{
+    Console.WriteLine("Available cars for renting: ");
+    foreach(var car in cars)
+    {
+        if (car.IsRented && !car.IsCurrentlyRented)
+        {
+            Console.WriteLine($"ID: {car.Id} | {car.Brand} {car.Model} - {car.CarColor} - {car.Year} - {car.CarRentPrice} AZN");
+        }
     }
     Console.WriteLine();
 }
